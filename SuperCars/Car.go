@@ -7,7 +7,7 @@ import (
 
 const (
 	DB_HOST = "tcp(127.0.0.1:3306)"
-	DB_NAME = "super_cars"
+	DB_NAME = "projectcv"
 	DB_USER = "root"
 	DB_PASS = ""
 )
