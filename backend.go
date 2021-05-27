@@ -12,7 +12,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir("static")))
 	mux.HandleFunc("/addUser", AddUser)
-	//mux.HandleFunc("/GetCarByName",GetCarByName)
+	mux.HandleFunc("/getUser", GetUser)
 	//mux.HandleFunc("/GetAllCars",GetAllCars)
 	//mux.HandleFunc("/UpdateCar",UpdateCar)
 	//mux.HandleFunc("/DeleteCar",DeleteCar)
@@ -69,40 +69,38 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*func GetCarByName(w http.ResponseWriter, r *http.Request){
-	if r.URL.Path != "/GetCarByName" {
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/getUser" {
 		http.Error(w, "404 not found.", http.StatusNotFound)
 		return
 	}
-	brand := r.URL.Query().Get("brand")
-	if brand == "" {
-		http.Error(w, "Missing brand parameter", http.StatusBadRequest)
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Missing username parameter", http.StatusBadRequest)
 		return
 	}
-	model := r.URL.Query().Get("model")
-	if model == "" {
-		http.Error(w, "Missing model parameter", http.StatusBadRequest)
+	password := r.URL.Query().Get("password")
+	if password == "" {
+		http.Error(w, "Missing password parameter", http.StatusBadRequest)
 		return
 	}
 	switch r.Method {
-	case "GET":{
-		var car SuperCars.Car
-		searchedCar := car.GetCarByName(brand,model)
+	case "GET":
+		{
+			var user Users.User
+			user.GetUser(username, password)
 
-		fmt.Fprintf(w, "The searched car's details are: \n")
-		fmt.Fprintf(w, "The Brand is %s\n", searchedCar.GetBrand())
-		fmt.Fprintf(w, "The model is %s\n", searchedCar.GetModel())
-		fmt.Fprintf(w, "The Class is %s\n", searchedCar.GetClass())
-		fmt.Fprintf(w, "The Production Country is %s\n", searchedCar.GetProductionCountry())
-		fmt.Fprintf(w, "Horsepower = %d\n", searchedCar.GetHP())
-		fmt.Fprintf(w, "The number of doors is %d\n", searchedCar.GetNrOfDoors())
-		fmt.Fprintf(w, "The latest price estimation for the car is = %s\n", searchedCar.GetPrice())
-	}
+			fmt.Fprintf(w, "User info: \n")
+			fmt.Fprintf(w, "Name: %s \n", user.GetName())
+			fmt.Fprintf(w, "Birth Date: %s \n", user.GetBirthDate())
+			fmt.Fprintf(w, "Details: %s \n", user.GetDetails())
+		}
 	default:
 		fmt.Fprintf(w, "Expected method GET")
 	}
 }
 
+/*
 func enableCors(w *http.ResponseWriter) {(*w).Header().Set("Access-Control-Allow-Origin", "*")}
 
 func GetAllCars(w http.ResponseWriter, r *http.Request){

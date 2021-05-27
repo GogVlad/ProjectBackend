@@ -22,7 +22,7 @@ type User struct {
 	password   string `json:"password"`
 	name       string `json:"name"`
 	birth_date string `json:"birth_date"`
-	details    string    `json:"details"`
+	details    string `json:"details"`
 }
 
 func dbConnect() *sql.DB {
@@ -49,8 +49,8 @@ func AddUser(id int, username string, password string, name string, birth_date s
 	defer insert.Close()
 }
 
-func (user *User) GetAllUsers() []User{
-	db:=dbConnect()
+func (user *User) GetAllUsers() []User {
+	db := dbConnect()
 	defer db.Close()
 	var users []User
 	rows, err1 := db.Query("SELECT * FROM user")
@@ -64,37 +64,53 @@ func (user *User) GetAllUsers() []User{
 				panic(err1)
 			}
 		}
-		users=append(users, *user)
+		users = append(users, *user)
 	}
 	return users
 }
 
-func (user *User) GetId() int{
+func (user *User) GetUser(username string, password string) {
+	db:=dbConnect()
+	defer db.Close()
+	sqlStatement := `SELECT * FROM user WHERE username=? AND password=? `
+	encryptedPass := EncriptDetails(password)
+	row := db.QueryRow(sqlStatement, username, encryptedPass)
+	err1 := row.Scan(&user.id, &user.username, &user.password, &user.name, &user.birth_date, &user.details)
+	if err1 != nil {
+		if err1 == sql.ErrNoRows {
+			fmt.Println("Zero rows found")
+		} else {
+			panic(err1)
+		}
+	}
+}
+
+func (user *User) GetId() int {
 	return user.id
 }
-func (user *User) GetUsername() string{
+func (user *User) GetUsername() string {
 	return user.username
 }
-func (user *User) GetPassword() string{
+func (user *User) GetPassword() string {
 	return user.password
 }
-func (user *User) GetName() string{
+func (user *User) GetName() string {
 	return user.name
 }
-func (user *User) GetBirthDate() string{
+func (user *User) GetBirthDate() string {
 	return user.birth_date
 }
-func (user *User) GetDetails() string{
+func (user *User) GetDetails() string {
 	return user.details
 }
 
-func EncriptDetails(pass string) string{
+func EncriptDetails(pass string) string {
 	symbols := "ABCDEFGH:IJKLMNOP;QRSTUVWX/YZabcdef?ghijklmn!opqrstuv(wxyz0123)456789 .-=+[],*{}@"
-	encryption:=encryptPassword(symbols, pass, "encrypted.txt")
+	encryption := encryptPassword(symbols, pass, "encrypted.txt")
 	return encryption
 }
 
-func encryptPassword(symbols string, input string, outputFile string) string{
+func encryptPassword(symbols string, input string, outputFile string) string {
 	words, _ := os.Create(outputFile)
 	w := bufio.NewWriter(words)
 	for i := 0; i < len(input)-1; i = i + 2 {
@@ -115,6 +131,6 @@ func encryptPassword(symbols string, input string, outputFile string) string{
 	_ = w.Flush()
 	encryptionByte, _ := ioutil.ReadFile(outputFile)
 	encryptionString := string(encryptionByte[:])
-	fmt.Println(encryptionString)
+	//fmt.Println(encryptionString)
 	return encryptionString
 }
