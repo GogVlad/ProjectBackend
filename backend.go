@@ -1,4 +1,4 @@
-package main
+package backend
 
 import (
 	"backend/backend.go/SuperCars"
@@ -23,6 +23,9 @@ func main() {
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)
 	}
+	symbols := "ABCDEFGH:IJKLMNOP;QRSTUVWX/YZabcdef?ghijklmn!opqrstuv(wxyz0123)456789 .-=+[],*{}@"
+	encryptTest(symbols, "input.txt", "encrypted.txt")
+	encryptTest(symbols, "encrypted.txt", "decrypted.txt")
 }
 
 func AddCar(w http.ResponseWriter, r *http.Request) {
