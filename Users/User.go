@@ -1,8 +1,12 @@
 package Users
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 )
 
 const (
@@ -35,7 +39,8 @@ func AddUser(id int, username string, password string, name string, birth_date s
 
 	db := dbConnect()
 	defer db.Close()
-	newCar := fmt.Sprintf("INSERT INTO user VALUES (%d, '%s', '%s', '%s','%s','%s')", id, username, password, name,
+	encryptedPass := EncriptDetails(password)
+	newCar := fmt.Sprintf("INSERT INTO user VALUES (%d, '%s', '%s', '%s','%s','%s')", id, username, encryptedPass, name,
 		birth_date, details)
 	insert, err := db.Query(newCar)
 	if err != nil {
@@ -81,4 +86,35 @@ func (user *User) GetBirthDate() string{
 }
 func (user *User) GetDetails() string{
 	return user.details
+}
+
+func EncriptDetails(pass string) string{
+	symbols := "ABCDEFGH:IJKLMNOP;QRSTUVWX/YZabcdef?ghijklmn!opqrstuv(wxyz0123)456789 .-=+[],*{}@"
+	encryption:=encryptPassword(symbols, pass, "encrypted.txt")
+	return encryption
+}
+
+func encryptPassword(symbols string, input string, outputFile string) string{
+	words, _ := os.Create(outputFile)
+	w := bufio.NewWriter(words)
+	for i := 0; i < len(input)-1; i = i + 2 {
+		p1 := strings.Index(symbols, string(input[i]))
+		p2 := strings.Index(symbols, string(input[i+1]))
+		if p1 == -1 || p2 == -1 {
+			_, _ = fmt.Fprintf(w, "%c%c", input[i], input[i+1])
+		} else {
+			l1 := p1 / 9
+			c1 := p1 % 9
+			l2 := p2 / 9
+			c2 := p2 % 9
+			p1 = l2*9 + c1
+			p2 = l1*9 + c2
+			_, _ = fmt.Fprintf(w, "%c%c", symbols[p1], symbols[p2])
+		}
+	}
+	_ = w.Flush()
+	encryptionByte, _ := ioutil.ReadFile(outputFile)
+	encryptionString := string(encryptionByte[:])
+	fmt.Println(encryptionString)
+	return encryptionString
 }
