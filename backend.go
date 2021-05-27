@@ -1,23 +1,21 @@
 package main
 
 import (
-	"backend/backend.go/SuperCars"
+	"backend/backend.go/Users"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
-	"strconv"
 )
-
 
 func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir("static")))
-	mux.HandleFunc("/addCar",AddCar)
-	mux.HandleFunc("/GetCarByName",GetCarByName)
-	mux.HandleFunc("/GetAllCars",GetAllCars)
-	mux.HandleFunc("/UpdateCar",UpdateCar)
-	mux.HandleFunc("/DeleteCar",DeleteCar)
+	mux.HandleFunc("/addUser", AddUser)
+	//mux.HandleFunc("/GetCarByName",GetCarByName)
+	//mux.HandleFunc("/GetAllCars",GetAllCars)
+	//mux.HandleFunc("/UpdateCar",UpdateCar)
+	//mux.HandleFunc("/DeleteCar",DeleteCar)
 
 	fmt.Println("Starting server...")
 	if err := http.ListenAndServe(":8080", mux); err != nil {
@@ -25,70 +23,53 @@ func main() {
 	}
 }
 
-func AddCar(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/addCar" {
+func AddUser(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/addUser" {
 		http.Error(w, "404 not found.", http.StatusNotFound)
 		return
 	}
-	brand := r.URL.Query().Get("brand")
-	if brand == "" {
-		http.Error(w, "Missing brand parameter", http.StatusBadRequest)
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Missing username parameter", http.StatusBadRequest)
 		return
 	}
-	model := r.URL.Query().Get("model")
-	if model == "" {
-		http.Error(w, "Missing model parameter", http.StatusBadRequest)
+	password := r.URL.Query().Get("password")
+	if password == "" {
+		http.Error(w, "Missing password parameter", http.StatusBadRequest)
 		return
 	}
-	class := r.URL.Query().Get("class")
-	if class == "" {
-		http.Error(w, "Missing class parameter", http.StatusBadRequest)
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		http.Error(w, "Missing name parameter", http.StatusBadRequest)
 		return
 	}
-	productionCountry := r.URL.Query().Get("productionCountry")
-	if productionCountry == "" {
-		http.Error(w, "Missing productionCountry parameter", http.StatusBadRequest)
+	birth_date := r.URL.Query().Get("birth_date")
+	if birth_date == "" {
+		http.Error(w, "Missing birth_date parameter", http.StatusBadRequest)
 		return
 	}
-	horsepower := r.URL.Query().Get("horsepower")
-	if horsepower == "" {
-		http.Error(w, "Missing horsepower parameter", http.StatusBadRequest)
+	details := r.URL.Query().Get("details")
+	if details == "" {
+		http.Error(w, "Missing details parameter", http.StatusBadRequest)
 		return
 	}
-	nrOfDoors := r.URL.Query().Get("nrOfDoors")
-	if nrOfDoors == "" {
-		http.Error(w, "Missing nrOfDoors parameter", http.StatusBadRequest)
-		return
-	}
-	lastKnownPrice := r.URL.Query().Get("lastKnownPrice")
-	if lastKnownPrice == "" {
-		http.Error(w, "Missing lastKnownPrice parameter", http.StatusBadRequest)
-		return
-	}
-	hp, _ := strconv.Atoi(horsepower)
-	nD, _ := strconv.Atoi(nrOfDoors)
 
 	switch r.Method {
-	case "POST":{
-		var car SuperCars.Car
-		car.GetAllCars()
-		SuperCars.AddCar(car.GetId()+1,brand,model,class,productionCountry,hp,nD,lastKnownPrice)
+	case "POST":
+		{
+			var user Users.User
+			user.GetAllUsers()
+			Users.AddUser(user.GetId()+1, username, password, name, birth_date, details)
 
-		fmt.Fprintf(w, "The last added car's details are: \n")
-		fmt.Fprintf(w, "The Brand is %s\n", brand)
-		fmt.Fprintf(w, "The model is %s\n", model)
-		fmt.Fprintf(w, "The Class is %s\n", class)
-		fmt.Fprintf(w, "The Production Country is %s\n", productionCountry)
-		fmt.Fprintf(w, "Horsepower = %d\n", hp)
-		fmt.Fprintf(w, "The number of doors is %d\n", nD)
-		fmt.Fprintf(w, "The latest price estimation for the car is = %s\n", lastKnownPrice)
-	}
+			fmt.Fprintf(w, "New user added! \n")
+
+		}
 	default:
 		fmt.Fprintf(w, "Expected method POST")
 	}
 }
 
-func GetCarByName(w http.ResponseWriter, r *http.Request){
+/*func GetCarByName(w http.ResponseWriter, r *http.Request){
 	if r.URL.Path != "/GetCarByName" {
 		http.Error(w, "404 not found.", http.StatusNotFound)
 		return
@@ -237,3 +218,4 @@ func DeleteCar(w http.ResponseWriter, r *http.Request){
 		}
 	}
 }
+*/
