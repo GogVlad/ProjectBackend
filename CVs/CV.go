@@ -1,6 +1,9 @@
 package CVs
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 const (
 	DB_HOST = "tcp(127.0.0.1:3306)"
@@ -10,13 +13,14 @@ const (
 )
 
 type CV struct {
-	id                    int    `json:"id"`
-	name                  string `json:"name"`
-	linkedinLink          string `json:"linkedinLink"`
-	gitLink               string `json:"gitLink"`
-	studies               string `json:"studies"`
-	experience            string `json:"experience"`
+	id                   int    `json:"id"`
+	name                 string `json:"name"`
+	linkedinLink         string `json:"linkedinLink"`
+	gitLink              string `json:"gitLink"`
+	studies              string `json:"studies"`
+	experience           string `json:"experience"`
 	personalCompetencies string `json:"personal_competencies"`
+	address              string `json:"address"`
 }
 
 func dbConnect() *sql.DB {
@@ -55,3 +59,23 @@ func (user *CV) GetExperience() string {
 func (user *CV) GetPersonalCompetencies() string {
 	return user.personalCompetencies
 }
+
+func (user *CV) GetAddress() string {
+	return user.address
+}
+
+func (cv *CV) GetCVByID(id int) {
+	db := dbConnect()
+	defer db.Close()
+	sqlStatement := `SELECT * FROM cv WHERE id=? `
+	row := db.QueryRow(sqlStatement, id)
+	err1 := row.Scan(&cv.id, &cv.name, &cv.linkedinLink, &cv.gitLink, &cv.studies, &cv.experience, &cv.personalCompetencies, &cv.address)
+	if err1 != nil {
+		if err1 == sql.ErrNoRows {
+			fmt.Println("Zero rows found")
+		} else {
+			panic(err1)
+		}
+	}
+}
+

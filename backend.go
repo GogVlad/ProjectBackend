@@ -1,11 +1,13 @@
 package main
 
 import (
+	"backend/backend.go/CVs"
 	"backend/backend.go/Users"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -13,6 +15,7 @@ func main() {
 	mux.Handle("/", http.FileServer(http.Dir("static")))
 	mux.HandleFunc("/addUser", AddUser)
 	mux.HandleFunc("/getUser", GetUser)
+	mux.HandleFunc("/getCV",GetCV)
 	//mux.HandleFunc("/GetAllCars",GetAllCars)
 	//mux.HandleFunc("/UpdateCar",UpdateCar)
 	//mux.HandleFunc("/DeleteCar",DeleteCar)
@@ -21,6 +24,38 @@ func main() {
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func GetCV(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/getCV" {
+		http.Error(w, "404 not found.", http.StatusNotFound)
+		return
+	}
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		return
+	}
+	id1, _ := strconv.Atoi(id)
+	switch r.Method {
+	case "GET":
+		{
+			var cv CVs.CV
+			cv.GetCVByID(id1)
+
+			fmt.Fprintf(w, "User info: \n")
+			fmt.Fprintf(w, "Name: %s \n", cv.GetName())
+			fmt.Fprintf(w, "LinkedIn link: %s \n", cv.GetLinkedinLink())
+			fmt.Fprintf(w, "GitHub link: %s \n", cv.GetGitLink())
+			fmt.Fprintf(w, "Studies: %s \n", cv.GetStudies())
+			fmt.Fprintf(w, "Experience: %s \n", cv.GetExperience())
+			fmt.Fprintf(w, "Personal competencies: %s \n", cv.GetPersonalCompetencies())
+			fmt.Fprintf(w, "Address: %s \n", cv.GetAddress())
+		}
+	default:
+		fmt.Fprintf(w, "Expected method GET")
+	}
+
 }
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
