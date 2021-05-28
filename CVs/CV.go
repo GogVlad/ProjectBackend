@@ -79,3 +79,14 @@ func (cv *CV) GetCVByID(id int) {
 	}
 }
 
+func UpdateCV(id int, name string, linkedinLink string, gitLink string, studies string, experience string, personalCompetencies string, address string){
+
+	db:=dbConnect()
+	defer db.Close()
+	ins, err1 := db.Prepare("UPDATE cars SET name=?, linkedinLink=?, gitLink=?, studies=?, experience=?, personalCompetencies=?, address=? WHERE id=?")
+	if err1 != nil {
+		panic(err1.Error())
+	}
+	ins.Exec(id, name, linkedinLink, gitLink, studies, experience, personalCompetencies, address)
+}
+
