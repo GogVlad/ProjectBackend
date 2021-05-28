@@ -1,6 +1,9 @@
 package CVs
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 const (
 	DB_HOST = "tcp(127.0.0.1:3306)"
@@ -54,4 +57,19 @@ func (user *CV) GetExperience() string {
 
 func (user *CV) GetPersonalCompetencies() string {
 	return user.personalCompetencies
+}
+
+func (cv *CV)GetCVByID(id int) {
+	db:=dbConnect()
+	defer db.Close()
+	sqlStatement := `SELECT * FROM cv WHERE id=? `
+	row := db.QueryRow(sqlStatement, id)
+	err1 := row.Scan(&cv.id, &cv.name, &cv.linkedinLink, &cv.gitLink, &cv.studies, &cv.experience, &cv.personalCompetencies)
+	if err1 != nil {
+		if err1 == sql.ErrNoRows {
+			fmt.Println("Zero rows found")
+		} else {
+			panic(err1)
+		}
+	}
 }
