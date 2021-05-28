@@ -50,6 +50,7 @@ func GetCV(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Studies: %s \n", cv.GetStudies())
 			fmt.Fprintf(w, "Experience: %s \n", cv.GetExperience())
 			fmt.Fprintf(w, "Personal competencies: %s \n", cv.GetPersonalCompetencies())
+			fmt.Fprintf(w, "Address: %s \n", cv.GetAddress())
 		}
 	default:
 		fmt.Fprintf(w, "Expected method GET")
