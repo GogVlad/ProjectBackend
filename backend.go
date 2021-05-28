@@ -16,6 +16,7 @@ func main() {
 	mux.HandleFunc("/addUser", AddUser)
 	mux.HandleFunc("/getUser", GetUser)
 	mux.HandleFunc("/getCV",GetCV)
+	mux.HandleFunc("/updateCV",UpdateCV)
 	//mux.HandleFunc("/GetAllCars",GetAllCars)
 	//mux.HandleFunc("/UpdateCar",UpdateCar)
 	//mux.HandleFunc("/DeleteCar",DeleteCar)
@@ -132,6 +133,72 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	default:
 		fmt.Fprintf(w, "Expected method GET")
+	}
+}
+
+func UpdateCV(w http.ResponseWriter, r *http.Request){
+	if r.URL.Path != "/UpdateCV" {
+		http.Error(w, "404 not found.", http.StatusNotFound)
+		return
+	}
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	name := r.URL.Query().Get("brand")
+	if name == "" {
+		http.Error(w, "Missing name parameter", http.StatusBadRequest)
+		return
+	}
+	linkedinLink := r.URL.Query().Get("linkedinLink")
+	if linkedinLink == "" {
+		http.Error(w, "Missing linkedinLink parameter", http.StatusBadRequest)
+		return
+	}
+	gitLink := r.URL.Query().Get("gitLink")
+	if gitLink == "" {
+		http.Error(w, "Missing gitLink parameter", http.StatusBadRequest)
+		return
+	}
+	studies := r.URL.Query().Get("studies")
+	if studies == "" {
+		http.Error(w, "Missing studies parameter", http.StatusBadRequest)
+		return
+	}
+	experience := r.URL.Query().Get("experience")
+	if experience == "" {
+		http.Error(w, "Missing experience parameter", http.StatusBadRequest)
+		return
+	}
+	personalCompetencies := r.URL.Query().Get("personalCompetencies")
+	if personalCompetencies == "" {
+		http.Error(w, "Missing personalCompetencies parameter", http.StatusBadRequest)
+		return
+	}
+	address := r.URL.Query().Get("address")
+	if address == "" {
+		http.Error(w, "Missing address parameter", http.StatusBadRequest)
+		return
+	}
+	intID, _ := strconv.Atoi(id)
+
+	switch r.Method {
+	case "PUT":
+		{
+			CVs.UpdateCV(intID, name, linkedinLink, gitLink, studies, experience, personalCompetencies, address)
+
+			fmt.Fprintf(w, "User info: \n")
+			fmt.Fprintf(w, "Name: %s \n", name)
+			fmt.Fprintf(w, "LinkedIn link: %s \n", linkedinLink)
+			fmt.Fprintf(w, "GitHub link: %s \n", gitLink)
+			fmt.Fprintf(w, "Studies: %s \n", studies)
+			fmt.Fprintf(w, "Experience: %s \n", experience)
+			fmt.Fprintf(w, "Personal competencies: %s \n", personalCompetencies)
+			fmt.Fprintf(w, "Address: %s \n", address)
+			fmt.Fprintf(w, "The last updated car's details are: \n")
+		}
 	}
 }
 
